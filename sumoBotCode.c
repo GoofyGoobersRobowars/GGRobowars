@@ -197,28 +197,27 @@ void checkMicroStartSignal() {
 }
 
 void setup() {
-// Serial communication at a baudrate of 9600
   Serial.begin(9600);
   irSetup();
   motorSetup();
 }
 
 void loop() {
-  // Get a distance measurement 
-  IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
-  IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
-  IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
-/*
-// Print the measured distance to the serial monitor
- Serial.print("Left distance: ");
-  Serial.print(IR_LEFT_DISTANCE);
-  Serial.println(" cm");
- Serial.print("Forward distance: ");
-  Serial.print(IR_FORWARD_DISTANCE);
-  Serial.println(" cm");
- Serial.print("Right distance: ");
-  Serial.print(IR_RIGHT_DISTANCE);
-  Serial.println(" cm");
- delay(100);
-*/
+  checkMicroStartSignal();
+  
+  if (robotEnabled) {
+    IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
+    IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
+    IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
+    
+    // First priority: Check for ring edge (white line)
+    detectLine();
+
+    // Second priority: Find and attack opponent
+  }
+  else {
+    // Robot is disabled - ensure motors are stopped
+    stopMotors();
+  }
+  delay(10);
 }
