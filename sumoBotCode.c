@@ -216,7 +216,7 @@ void loop() {
     // Second priority: Find and attack opponent
   }
   else {
-    // Robot is disabled - ensure motors are stopped
+    // Robot is disabled 
     stopMotors();
   }
   delay(10);
