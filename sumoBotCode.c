@@ -43,6 +43,32 @@ float IR_RIGHT_DISTANCE = 0;
 #define STBY1 47
 #define STBY2 21
 
+void irLineDetectSetup(){
+  pinMode(LD_FR_PIN,INPUT);
+  pinMode(LD_FL_PIN,INPUT);
+  pinMode(LD_BR_PIN,INPUT);
+  pinMode(LD_BL_PIN,INPUT);
+}
+
+void detectLine(){
+  int forwardRightValue=digitalReal(LD_FR_PIN,INPUT);
+  if (forwardRightValue==0){
+    
+   }
+  int forwardLeftValue=digitalReal(LD_FR_PIN,INPUT);
+  if (forwardLeftValue==0){
+    
+   }
+  int backwardsRightValue=digitalReal(LD_FR_PIN,INPUT);
+  if (backwardsRightValue==0){
+    
+   }
+  int backwardLeftValue=digitalReal(LD_FR_PIN,INPUT);
+  if (backwardLeftValue==0){
+    
+   }
+}
+
 void irSetup(){
   pinMode(IR_FORWARD_PIN, INPUT);
   pinMode(IR_LEFT_PIN, INPUT);
