@@ -218,5 +218,6 @@ void loop() {
     // Second priority: Find and attack opponent
     
   }
+  
   delay(10);
 }
