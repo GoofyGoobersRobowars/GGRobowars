@@ -98,9 +98,32 @@ void moveForward() {
 }
 
 float readDistance(int pin) {
+  float sum = 0;
   int adc = analogRead(pin);
   float voltage = adc * (3.3 / 4095.0);
-  float distance = 27.86 / pow(voltage, 1.15);
+  sum = 27.86 / pow(voltage, 1.15);
+  adc=analogRead(pin);
+  voltage = adc * (3.3 / 4095.0);
+  sum+=27.86 / pow(voltage, 1.15);
+  float distance = sum/2;
   if (distance > 100) distance = 100;
   return distance;
+}
+
+void setup() {
+  // Serial communication at a baudrate of 9600
+  Serial.begin(9600);
+  pinMode(IR_FORWARD_PIN, INPUT);
+}
+
+void loop() {
+  // Get a distance measurement and store it as distance_cm
+  int distance_cm = readDistance(IR_FORWARD_PIN);
+
+  // Print the measured distance to the serial monitor
+  Serial.print("Mean distance: ");
+  Serial.print(distance_cm);
+  Serial.println(" cm");
+
+  delay(100);
 }
