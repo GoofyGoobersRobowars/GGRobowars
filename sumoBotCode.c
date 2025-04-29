@@ -200,6 +200,8 @@ void setup() {
   Serial.begin(9600);
   irSetup();
   motorSetup();
+  irLineDetectSetup();  
+  microStartSetup();
 }
 
 void loop() {
@@ -214,10 +216,7 @@ void loop() {
     detectLine();
 
     // Second priority: Find and attack opponent
-  }
-  else {
-    // Robot is disabled 
-    stopMotors();
+    
   }
   delay(10);
 }
