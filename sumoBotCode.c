@@ -43,6 +43,54 @@ float IR_RIGHT_DISTANCE = 0;
 #define STBY1 47
 #define STBY2 21
 
+void irLineDetectSetup(){
+  pinMode(LD_FR_PIN,INPUT);
+  pinMode(LD_FL_PIN,INPUT);
+  pinMode(LD_BR_PIN,INPUT);
+  pinMode(LD_BL_PIN,INPUT);
+}
+
+void detectLine(){
+  int frontRightValue = digitalRead(LD_FR_PIN);
+  int frontLeftValue = digitalRead(LD_FL_PIN);
+  int backRightValue = digitalRead(LD_BR_PIN);
+  int backLeftValue = digitalRead(LD_BL_PIN);
+  
+  if (frontRightValue == 0 || frontLeftValue == 0){
+    moveBackwards();
+    if (frontRightValue == 0 && frontLeftValue == 0) {
+      delay(500); 
+    } else if (frontRightValue == 0) {
+      delay(300);
+      stopMotors();
+      spinLeft();
+      delay(100);
+    } else {
+      delay(300);
+      stopMotors();
+      spinRight();
+      delay(100);
+    }
+  }
+  
+  if (backRightValue == 0 || backLeftValue == 0){
+    moveForward();  
+    if (backRightValue == 0 && backLeftValue == 0) {
+      delay(500); 
+    } else if (backRightValue == 0) {
+      delay(300);
+      stopMotors();
+      spinLeft();
+      delay(100);
+    } else {
+      delay(300);
+      stopMotors();
+      spinRight();
+      delay(100);
+    }
+  }
+}
+
 void irSetup(){
   pinMode(IR_FORWARD_PIN, INPUT);
   pinMode(IR_LEFT_PIN, INPUT);
@@ -104,6 +152,14 @@ void moveForward() {
   digitalWrite(FFL, HIGH); digitalWrite(BFL, LOW);   // Front Left forward
   digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);   // Back Right forward
   digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);   // Front Right forward
+}
+
+void moveBackwards() {
+  setSpeed(255);
+  digitalWrite(FBL, LOW); digitalWrite(BBL, HIGH);   // Back Left backward
+  digitalWrite(FFL, LOW); digitalWrite(BFL, HIGH);   // Front Left backward
+  digitalWrite(FBR, LOW); digitalWrite(BBR, HIGH);   // Back Right backward
+  digitalWrite(FFR, LOW); digitalWrite(BFR, HIGH);   // Front Right backward
 }
 
 float readDistance(int pin) {
