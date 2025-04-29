@@ -96,3 +96,11 @@ void moveForward() {
   digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);   // Back Right forward
   digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);   // Front Right forward
 }
+
+float readDistance(int pin) {
+  int adc = analogRead(pin);
+  float voltage = adc * (3.3 / 4095.0);
+  float distance = 27.86 / pow(voltage, 1.15);
+  if (distance > 100) distance = 100;
+  return distance;
+}
