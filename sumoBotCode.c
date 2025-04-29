@@ -216,7 +216,7 @@ void loop() {
     detectLine();
 
     // Second priority: Find and attack opponent
-  
+    
   }
   delay(10);
 }
