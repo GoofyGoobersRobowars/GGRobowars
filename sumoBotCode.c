@@ -11,6 +11,7 @@ float IR_RIGHT_DISTANCE = 0;
 
 // === Sumostart Module ===
 #define SM_PIN 38
+bool robotEnabled = false;
 
 // === Line Detection IR ===
 #define LD_FR_PIN 7
@@ -50,47 +51,6 @@ void irLineDetectSetup(){
   pinMode(LD_BL_PIN,INPUT);
 }
 
-void detectLine(){
-  int frontRightValue = digitalRead(LD_FR_PIN);
-  int frontLeftValue = digitalRead(LD_FL_PIN);
-  int backRightValue = digitalRead(LD_BR_PIN);
-  int backLeftValue = digitalRead(LD_BL_PIN);
-  
-  if (frontRightValue == 0 || frontLeftValue == 0){
-    moveBackwards();
-    if (frontRightValue == 0 && frontLeftValue == 0) {
-      delay(500); 
-    } else if (frontRightValue == 0) {
-      delay(300);
-      stopMotors();
-      spinLeft();
-      delay(100);
-    } else {
-      delay(300);
-      stopMotors();
-      spinRight();
-      delay(100);
-    }
-  }
-  
-  if (backRightValue == 0 || backLeftValue == 0){
-    moveForward();  
-    if (backRightValue == 0 && backLeftValue == 0) {
-      delay(500); 
-    } else if (backRightValue == 0) {
-      delay(300);
-      stopMotors();
-      spinLeft();
-      delay(100);
-    } else {
-      delay(300);
-      stopMotors();
-      spinRight();
-      delay(100);
-    }
-  }
-}
-
 void irSetup(){
   pinMode(IR_FORWARD_PIN, INPUT);
   pinMode(IR_LEFT_PIN, INPUT);
@@ -109,6 +69,11 @@ void motorSetup() {
   ledcAttach(PWM_BR, 1000, 8);
   ledcAttach(PWM_FR, 1000, 8);
   ledcAttach(PWM_FL, 1000, 8);
+}
+
+void microStartSetup() {
+  pinMode(SM_PIN, INPUT);  
+  robotEnabled = false;    
 }
 
 void setSpeed(int speed) {
@@ -173,6 +138,62 @@ float readDistance(int pin) {
   float distance = sum/2;
   if (distance > 100) distance = 100;
   return distance;
+}
+
+void detectLine(){
+  int frontRightValue = digitalRead(LD_FR_PIN);
+  int frontLeftValue = digitalRead(LD_FL_PIN);
+  int backRightValue = digitalRead(LD_BR_PIN);
+  int backLeftValue = digitalRead(LD_BL_PIN);
+  
+  if (frontRightValue == 0 || frontLeftValue == 0){
+    moveBackwards();
+    if (frontRightValue == 0 && frontLeftValue == 0) {
+      delay(500); 
+    } else if (frontRightValue == 0) {
+      delay(300);
+      stopMotors();
+      spinLeft();
+      delay(100);
+    } else {
+      delay(300);
+      stopMotors();
+      spinRight();
+      delay(100);
+    }
+  }
+  
+  if (backRightValue == 0 || backLeftValue == 0){
+    moveForward();  
+    if (backRightValue == 0 && backLeftValue == 0) {
+      delay(500); 
+    } else if (backRightValue == 0) {
+      delay(300);
+      stopMotors();
+      spinLeft();
+      delay(100);
+    } else {
+      delay(300);
+      stopMotors();
+      spinRight();
+      delay(100);
+    }
+  }
+}
+
+void checkMicroStartSignal() {
+  int signalValue = digitalRead(SM_PIN);
+  
+  if (signalValue == HIGH && !robotEnabled) {
+    robotEnabled = true; 
+    Serial.println("Robot STARTED by MicroStart module!");
+  }
+  
+  if (signalValue == LOW && robotEnabled) {
+    robotEnabled = false;
+    stopMotors();
+    Serial.println("Robot STOPPED by MicroStart module!");
+  }
 }
 
 void setup() {
