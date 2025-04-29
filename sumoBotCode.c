@@ -123,10 +123,11 @@ void setup() {
 // Serial communication at a baudrate of 9600
   Serial.begin(9600);
   irSetup();
+  motorSetup();
 }
 
 void loop() {
-  // Get a distance measurement and store it as distance_cm
+  // Get a distance measurement 
   IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
   IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
   IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
