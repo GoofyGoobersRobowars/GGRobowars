@@ -5,6 +5,9 @@
 #define IR_LEFT_PIN    2
 #define IR_FORWARD_PIN 20
 #define IR_RIGHT_PIN   19
+float IR_LEFT_DISTANCE = 0;
+float IR_FORWARD_DISTANCE = 0;
+float IR_RIGHT_DISTANCE = 0;
 
 // === Sumostart Module ===
 #define SM_PIN 38
@@ -39,6 +42,12 @@
 // STBY pins
 #define STBY1 47
 #define STBY2 21
+
+void irSetup(){
+  pinMode(IR_FORWARD_PIN, INPUT);
+  pinMode(IR_LEFT_PIN, INPUT);
+  pinMode(IR_RIGHT_PIN, INPUT);
+}
 
 void motorSetup() {
   pinMode(FBL, OUTPUT); pinMode(BBL, OUTPUT); pinMode(PWM_BL, OUTPUT);
@@ -111,19 +120,27 @@ float readDistance(int pin) {
 }
 
 void setup() {
-  // Serial communication at a baudrate of 9600
+// Serial communication at a baudrate of 9600
   Serial.begin(9600);
-  pinMode(IR_FORWARD_PIN, INPUT);
+  irSetup();
 }
 
 void loop() {
   // Get a distance measurement and store it as distance_cm
-  int distance_cm = readDistance(IR_FORWARD_PIN);
-
-  // Print the measured distance to the serial monitor
-  Serial.print("Mean distance: ");
-  Serial.print(distance_cm);
+  IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
+  IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
+  IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
+/*
+// Print the measured distance to the serial monitor
+ Serial.print("Left distance: ");
+  Serial.print(IR_LEFT_DISTANCE);
   Serial.println(" cm");
-
-  delay(100);
+ Serial.print("Forward distance: ");
+  Serial.print(IR_FORWARD_DISTANCE);
+  Serial.println(" cm");
+ Serial.print("Right distance: ");
+  Serial.print(IR_RIGHT_DISTANCE);
+  Serial.println(" cm");
+ delay(100);
+*/
 }
