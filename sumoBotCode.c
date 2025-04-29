@@ -197,13 +197,11 @@ void checkMicroStartSignal() {
 }
 
 void setup() {
-// Serial communication at a baudrate of 9600
   Serial.begin(9600);
   irSetup();
   motorSetup();
 }
 
-void loop() {
 void loop() {
   checkMicroStartSignal();
   
@@ -216,6 +214,10 @@ void loop() {
     detectLine();
 
     // Second priority: Find and attack opponent
-    
   }
+  else {
+    // Robot is disabled - ensure motors are stopped
+    stopMotors();
+  }
+  delay(10);
 }
