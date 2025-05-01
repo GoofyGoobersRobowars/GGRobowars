@@ -226,7 +226,7 @@ void loop() {
     spinRight();
   }
     // First priority: Check for ring edge (white line)
-    
+    //detectline();
 
     // Second priority: Find and attack opponent
     
