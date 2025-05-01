@@ -1,61 +1,38 @@
 #include <Arduino.h>
 #include <math.h>
 
-// === SHARP IR SENSOR PINS ===
+// MICROSTART START PIN
+#define START_PIN 38
+
+// SHARP IR SENSOR PINS
 #define IR_LEFT_PIN    2
 #define IR_FORWARD_PIN 20
 #define IR_RIGHT_PIN   19
-float IR_LEFT_DISTANCE = 0;
-float IR_FORWARD_DISTANCE = 0;
-float IR_RIGHT_DISTANCE = 0;
 
-// === Sumostart Module ===
-#define SM_PIN 38
-bool robotEnabled = false;
-
-// === Line Detection IR ===
-#define LD_FR_PIN 7
-#define LD_FL_PIN 1
-#define LD_BR_PIN 4
-#define LD_BL_PIN 6
-
-// === MOTOR PINS ===
-// [Back Left]
+// MOTOR PINS
+// Back Left
 #define FBL 18
 #define BBL 17
 #define PWM_BL 5
 
-// [Back Right]
+// Back Right
 #define FBR 3
 #define BBR 8
 #define PWM_BR 9
 
-// [Front Right]
+// Front Right
 #define FFR 13
 #define BFR 14
 #define PWM_FR 10
 
-// [Front Left]
+// Front Left
 #define FFL 11
 #define BFL 12
 #define PWM_FL 16
 
-// STBY pins
+// STBY Pins
 #define STBY1 47
 #define STBY2 21
-
-void irLineDetectSetup(){
-  pinMode(LD_FR_PIN,INPUT);
-  pinMode(LD_FL_PIN,INPUT);
-  pinMode(LD_BR_PIN,INPUT);
-  pinMode(LD_BL_PIN,INPUT);
-}
-
-void irSetup(){
-  pinMode(IR_FORWARD_PIN, INPUT);
-  pinMode(IR_LEFT_PIN, INPUT);
-  pinMode(IR_RIGHT_PIN, INPUT);
-}
 
 void motorSetup() {
   pinMode(FBL, OUTPUT); pinMode(BBL, OUTPUT); pinMode(PWM_BL, OUTPUT);
@@ -69,11 +46,6 @@ void motorSetup() {
   ledcAttach(PWM_BR, 1000, 8);
   ledcAttach(PWM_FR, 1000, 8);
   ledcAttach(PWM_FL, 1000, 8);
-}
-
-void microStartSetup() {
-  pinMode(SM_PIN, INPUT);  
-  robotEnabled = false;    
 }
 
 void setSpeed(int speed) {
@@ -92,7 +64,7 @@ void stopMotors() {
 }
 
 void spinLeft() {
-  setSpeed(200);
+  setSpeed(255);
   digitalWrite(FBL, LOW); digitalWrite(BBL, HIGH);
   digitalWrite(FFL, HIGH); digitalWrite(BFL, LOW);
   digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);
@@ -102,122 +74,66 @@ void spinLeft() {
 }
 
 void spinRight() {
-  setSpeed(200);
+  setSpeed(255);
   digitalWrite(FBL, HIGH); digitalWrite(BBL, LOW);
   digitalWrite(FFL, LOW); digitalWrite(BFL, HIGH);
   digitalWrite(FBR, LOW); digitalWrite(BBR, HIGH);
   digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);
-  delay(10);  // brief turn
+  delay(10);
   stopMotors();
 }
 
 void moveForward() {
   setSpeed(255);
-  digitalWrite(FBL, HIGH); digitalWrite(BBL, LOW);   // Back Left forward
-  digitalWrite(FFL, HIGH); digitalWrite(BFL, LOW);   // Front Left forward
-  digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);   // Back Right forward
-  digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);   // Front Right forward
-}
-
-void moveBackwards() {
-  setSpeed(255);
-  digitalWrite(FBL, LOW); digitalWrite(BBL, HIGH);   // Back Left backward
-  digitalWrite(FFL, LOW); digitalWrite(BFL, HIGH);   // Front Left backward
-  digitalWrite(FBR, LOW); digitalWrite(BBR, HIGH);   // Back Right backward
-  digitalWrite(FFR, LOW); digitalWrite(BFR, HIGH);   // Front Right backward
+  digitalWrite(FBL, HIGH); digitalWrite(BBL, LOW);
+  digitalWrite(FFL, HIGH); digitalWrite(BFL, LOW);
+  digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);
+  digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);
 }
 
 float readDistance(int pin) {
-  float sum = 0;
   int adc = analogRead(pin);
   float voltage = adc * (3.3 / 4095.0);
-  sum = 27.86 / pow(voltage, 1.15);
-  adc=analogRead(pin);
-  voltage = adc * (3.3 / 4095.0);
-  sum+=27.86 / pow(voltage, 1.15);
-  float distance = sum/2;
+  float distance = 27.86 / pow(voltage, 1.15);
   if (distance > 100) distance = 100;
   return distance;
 }
 
-void detectLine(){
-  int frontRightValue = digitalRead(LD_FR_PIN);
-  int frontLeftValue = digitalRead(LD_FL_PIN);
-  int backRightValue = digitalRead(LD_BR_PIN);
-  int backLeftValue = digitalRead(LD_BL_PIN);
-  
-  if (frontRightValue == 0 || frontLeftValue == 0){
-    moveBackwards();
-    if (frontRightValue == 0 && frontLeftValue == 0) {
-      delay(500); 
-    } else if (frontRightValue == 0) {
-      delay(300);
-      stopMotors();
-      spinLeft();
-      delay(100);
-    } else {
-      delay(300);
-      stopMotors();
-      spinRight();
-      delay(100);
-    }
-  }
-  
-  if (backRightValue == 0 || backLeftValue == 0){
-    moveForward();  
-    if (backRightValue == 0 && backLeftValue == 0) {
-      delay(500); 
-    } else if (backRightValue == 0) {
-      delay(300);
-      stopMotors();
-      spinLeft();
-      delay(100);
-    } else {
-      delay(300);
-      stopMotors();
-      spinRight();
-      delay(100);
-    }
-  }
-}
-
-void checkMicroStartSignal() {
-  int signalValue = digitalRead(SM_PIN);
-  
-  if (signalValue == HIGH && !robotEnabled) {
-    robotEnabled = true; 
-    Serial.println("Robot STARTED by MicroStart module!");
-  }
-  
-  if (signalValue == LOW && robotEnabled) {
-    robotEnabled = false;
-    stopMotors();
-    Serial.println("Robot STOPPED by MicroStart module!");
-  }
-}
-
 void setup() {
-  Serial.begin(9600);
-  irSetup();
+  Serial.begin(115200);
+  pinMode(START_PIN, INPUT);
   motorSetup();
-  irLineDetectSetup();  
-  microStartSetup();
+  delay(10000);
+  /*while (digitalRead(START_PIN) == LOW) {
+    stopMotors();
+    delay(10);
+  }*/
 }
 
 void loop() {
-  checkMicroStartSignal();
   
-  if (robotEnabled) {
-    IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
-    IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
-    IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
-    
-    // First priority: Check for ring edge (white line)
-    detectLine();
+  /*if (digitalRead(START_PIN) == LOW) {
+    stopMotors();
+    return;
+  }*/
 
-    // Second priority: Find and attack opponent
-    
+  float distL = readDistance(IR_LEFT_PIN);
+  float distF = readDistance(IR_FORWARD_PIN);
+  float distR = readDistance(IR_RIGHT_PIN);
+  float minDist = min(distL, min(distF, distR));
+
+  if (minDist > 70) {
+    stopMotors();
+    return;
   }
-  
+
+  if (abs(distF - minDist) < 2.0) {
+    moveForward();
+    delay(10);
+  } else if (abs(distL - minDist) < 2.0) {
+    spinLeft();
+  } else {
+    spinRight();
+  }
   delay(10);
 }
