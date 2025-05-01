@@ -145,50 +145,64 @@ float readDistance(int pin) {
   return distance;
 }
 
-void detectLine(){
-   frontRightValue = digitalRead(LD_FR_PIN);
-   frontLeftValue = digitalRead(LD_FL_PIN);
-   backRightValue = digitalRead(LD_BR_PIN);
-   backLeftValue = digitalRead(LD_BL_PIN);
-
-   /*Serial.print(frontRightValue);
-   Serial.println(frontLeftValue);
-   Serial.println(backRightValue);
-   Serial.println(backLeftValue);*/
+bool detectLine() {
+  frontRightValue = digitalRead(LD_FR_PIN);
+  frontLeftValue = digitalRead(LD_FL_PIN);
+  backRightValue = digitalRead(LD_BR_PIN);
+  backLeftValue = digitalRead(LD_BL_PIN);
   
-  if (frontRightValue == 0 || frontLeftValue == 0){
-    moveBackwards();
+  /*
+  Serial.print("FR: "); Serial.print(frontRightValue);
+  Serial.print(" FL: "); Serial.print(frontLeftValue);
+  Serial.print(" BR: "); Serial.print(backRightValue);
+  Serial.print(" BL: "); Serial.println(backLeftValue);
+  */
+  
+  if (frontRightValue == 0 || frontLeftValue == 0) {
     if (frontRightValue == 0 && frontLeftValue == 0) {
-      delay(500); 
-    } else if (frontRightValue == 0) {
+      moveBackwards();
+      delay(500);
+    } 
+    else if (frontRightValue == 0) {
+      moveBackwards();
       delay(300);
       stopMotors();
       spinLeft();
-      delay(100);
-    } else {
+      delay(200);
+    } 
+    else {
+      moveBackwards();
       delay(300);
       stopMotors();
       spinRight();
-      delay(100);
+      delay(200); 
     }
+    return true; 
   }
   
-  if (backRightValue == 0 || backLeftValue == 0){
-    moveForward();  
+  if (backRightValue == 0 || backLeftValue == 0) {
     if (backRightValue == 0 && backLeftValue == 0) {
-      delay(500); 
-    } else if (backRightValue == 0) {
+      moveForward();
+      delay(500);
+    } 
+    else if (backRightValue == 0) {
+      moveForward();
       delay(300);
       stopMotors();
       spinLeft();
-      delay(100);
-    } else {
+      delay(200); 
+    } 
+    else {
+      moveForward();
       delay(300);
       stopMotors();
       spinRight();
-      delay(100);
+      delay(200);  
     }
+    return true;  
   }
+  
+  return false;  // No line detected
 }
 
 
@@ -223,7 +237,9 @@ void loop() {
     IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
     
     // First priority: Check for ring edge (white line)
-    detectLine();
+    if (detectLine()) {
+     return; 
+    }
 
     // Second priority: Find and attack opponent
     minDist = min(IR_LEFT_DISTANCE, min(IR_FORWARD_DISTANCE, IR_FORWARD_RIGHT));
