@@ -205,6 +205,8 @@ void setup() {
 }
 
 void loop() {
+ // checkMicroStartSignal();
+ // if(robotEnabled){
     IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
     IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
     IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
@@ -232,3 +234,4 @@ void loop() {
   
   delay(10);
 }
+//}
