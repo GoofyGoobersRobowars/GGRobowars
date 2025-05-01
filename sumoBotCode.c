@@ -241,6 +241,6 @@ void loop() {
   } else {
     spinRight();
   }
-  delay(100);
+  delay(10);
 }
 //}
