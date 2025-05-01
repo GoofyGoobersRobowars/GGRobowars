@@ -9,6 +9,12 @@
 #define IR_FORWARD_PIN 20
 #define IR_RIGHT_PIN   19
 
+// === Line Detection IR ===
+#define LD_FR_PIN 7
+#define LD_FL_PIN 1
+#define LD_BR_PIN 4
+#define LD_BL_PIN 6
+
 // MOTOR PINS
 // Back Left
 #define FBL 18
@@ -33,6 +39,13 @@
 // STBY Pins
 #define STBY1 47
 #define STBY2 21
+
+void lineDetectionSetup(){
+  pinMode(LD_FR_PIN, INPUT);
+  pinMode(LD_BR_PIN, INPUT);
+  pinMode(LD_FL_PIN, INPUT);
+  pinMode(LD_BL_PIN, INPUT);
+}
 
 void motorSetup() {
   pinMode(FBL, OUTPUT); pinMode(BBL, OUTPUT); pinMode(PWM_BL, OUTPUT);
@@ -91,19 +104,85 @@ void moveForward() {
   digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);
 }
 
+void moveBackwards() {
+  setSpeed(255);
+  digitalWrite(FBL, LOW); digitalWrite(BBL, HIGH);   // Back Left backward
+  digitalWrite(FFL, LOW); digitalWrite(BFL, HIGH);   // Front Left backward
+  digitalWrite(FBR, LOW); digitalWrite(BBR, HIGH);   // Back Right backward
+  digitalWrite(FFR, LOW); digitalWrite(BFR, HIGH);   // Front Right backward
+}
+
+void moveForwardSlow(){
+  setSpeed(125);
+  digitalWrite(FBL, HIGH); digitalWrite(BBL, LOW);
+  digitalWrite(FFL, HIGH); digitalWrite(BFL, LOW);
+  digitalWrite(FBR, HIGH); digitalWrite(BBR, LOW);
+  digitalWrite(FFR, HIGH); digitalWrite(BFR, LOW);
+}
+
 float readDistance(int pin) {
   int adc = analogRead(pin);
   float voltage = adc * (3.3 / 4095.0);
   float distance = 27.86 / pow(voltage, 1.15);
+  adc = analogRead(pin);
+  voltage = adc * (3.3 / 4095.0);
+  distance += 27.86 / pow(voltage, 1.15);
   if (distance > 100) distance = 100;
   return distance;
 }
 
+void detectLine(){
+  int frontRightValue = digitalRead(LD_FR_PIN);
+  int frontLeftValue = digitalRead(LD_FL_PIN);
+  int backRightValue = digitalRead(LD_BR_PIN);
+  int backLeftValue = digitalRead(LD_BL_PIN);
+
+  Serial.print("FL: "); Serial.println(frontLeftValue);
+  Serial.print("FR: "); Serial.println(frontRightValue);
+  Serial.print("BL: "); Serial.println(backLeftValue);
+  Serial.print("BR: "); Serial.println(backRightValue);
+
+  if(frontRightValue == 0 && frontLeftValue == 0){
+    stopMotors();
+    moveBackwards();
+    delay(750);
+    stopMotors();
+    spinRight();
+    delay(1000);
+    stopMotors();
+  }
+  else if(backRightValue == 0 && backLeftValue == 0){
+    stopMotors();
+    moveForward();
+    delay(750);
+    stopMotors();
+    spinLeft();
+    delay(1000);
+    stopMotors();
+  }
+  else if(frontRightValue == 0 || backLeftValue == 0){
+    stopMotors();
+    spinLeft();
+    delay(1000);
+    stopMotors();
+  }
+  else if(frontLeftValue == 0 || backRightValue == 0){
+    stopMotors();
+    spinRight();
+    delay(1000);
+    stopMotors();
+  }
+  else{
+    moveForwardSlow();
+  }
+}
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  lineDetectionSetup();
   pinMode(START_PIN, INPUT);
   motorSetup();
-  delay(10000);
+  delay(5000);
   /*while (digitalRead(START_PIN) == LOW) {
     stopMotors();
     delay(10);
@@ -111,7 +190,6 @@ void setup() {
 }
 
 void loop() {
-  
   /*if (digitalRead(START_PIN) == LOW) {
     stopMotors();
     return;
@@ -122,11 +200,11 @@ void loop() {
   float distR = readDistance(IR_RIGHT_PIN);
   float minDist = min(distL, min(distF, distR));
 
-  if (minDist > 70) {
-    stopMotors();
+  if (minDist > 10) {
+    detectLine();
     return;
   }
-
+  /*
   if (abs(distF - minDist) < 2.0) {
     moveForward();
     delay(10);
@@ -134,6 +212,6 @@ void loop() {
     spinLeft();
   } else {
     spinRight();
-  }
+  }*/
   delay(10);
 }
