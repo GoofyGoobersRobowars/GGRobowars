@@ -8,6 +8,7 @@
 float IR_LEFT_DISTANCE = 0;
 float IR_FORWARD_DISTANCE = 0;
 float IR_RIGHT_DISTANCE = 0;
+float minDist = 0; 
 
 // === Sumostart Module ===
 #define SM_PIN 38
