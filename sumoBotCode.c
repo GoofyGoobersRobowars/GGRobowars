@@ -8,7 +8,6 @@
 float IR_LEFT_DISTANCE = 0;
 float IR_FORWARD_DISTANCE = 0;
 float IR_RIGHT_DISTANCE = 0;
-float minDist = 0; 
 
 // === Sumostart Module ===
 #define SM_PIN 38
@@ -19,6 +18,11 @@ bool robotEnabled = false;
 #define LD_FL_PIN 1
 #define LD_BR_PIN 4
 #define LD_BL_PIN 6
+
+ int frontRightValue;
+  int frontLeftValue;
+  int backRightValue;
+  int backLeftValue;
 
 // === MOTOR PINS ===
 // [Back Left]
@@ -142,12 +146,17 @@ float readDistance(int pin) {
 }
 
 void detectLine(){
-  int frontRightValue = digitalRead(LD_FR_PIN);
-  int frontLeftValue = digitalRead(LD_FL_PIN);
-  int backRightValue = digitalRead(LD_BR_PIN);
-  int backLeftValue = digitalRead(LD_BL_PIN);
+   frontRightValue = digitalRead(LD_FR_PIN);
+   frontLeftValue = digitalRead(LD_FL_PIN);
+   backRightValue = digitalRead(LD_BR_PIN);
+   backLeftValue = digitalRead(LD_BL_PIN);
+
+   Serial.print(frontRightValue);
+   /*Serial.println(frontLeftValue);
+   Serial.println(backRightValue);
+   Serial.println(backLeftValue);*/
   
-  if (frontRightValue == 0 || frontLeftValue == 0){
+  /*if (frontRightValue == 0 || frontLeftValue == 0){
     moveBackwards();
     if (frontRightValue == 0 && frontLeftValue == 0) {
       delay(500); 
@@ -180,7 +189,8 @@ void detectLine(){
       delay(100);
     }
   }
-}
+}*/
+
 
 void checkMicroStartSignal() {
   int signalValue = digitalRead(SM_PIN);
@@ -211,7 +221,12 @@ void loop() {
     IR_LEFT_DISTANCE = readDistance(IR_LEFT_PIN);
     IR_FORWARD_DISTANCE = readDistance(IR_FORWARD_PIN);
     IR_RIGHT_DISTANCE = readDistance(IR_RIGHT_PIN);
-    minDist = min(IR_LEFT_DISTANCE, min(IR_FORWARD_DISTANCE, IR_FORWARD_RIGHT));
+    
+    // First priority: Check for ring edge (white line)
+    detectLine();
+
+    // Second priority: Find and attack opponent
+    /*minDist = min(IR_LEFT_DISTANCE, min(IR_FORWARD_DISTANCE, IR_FORWARD_RIGHT));
 
   if (minDist > 70) {
     stopMotors();
@@ -225,14 +240,7 @@ void loop() {
     spinLeft();
   } else {
     spinRight();
-  }
-    // First priority: Check for ring edge (white line)
-    //detectline();
-
-    // Second priority: Find and attack opponent
-    
-  
-  
-  delay(10);
+  }*/
+  delay(100);
 }
 //}
