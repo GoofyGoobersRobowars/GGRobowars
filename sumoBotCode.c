@@ -151,12 +151,12 @@ void detectLine(){
    backRightValue = digitalRead(LD_BR_PIN);
    backLeftValue = digitalRead(LD_BL_PIN);
 
-   Serial.print(frontRightValue);
-   /*Serial.println(frontLeftValue);
+   /*Serial.print(frontRightValue);
+   Serial.println(frontLeftValue);
    Serial.println(backRightValue);
    Serial.println(backLeftValue);*/
   
-  /*if (frontRightValue == 0 || frontLeftValue == 0){
+  if (frontRightValue == 0 || frontLeftValue == 0){
     moveBackwards();
     if (frontRightValue == 0 && frontLeftValue == 0) {
       delay(500); 
@@ -189,7 +189,7 @@ void detectLine(){
       delay(100);
     }
   }
-}*/
+}
 
 
 void checkMicroStartSignal() {
@@ -226,7 +226,7 @@ void loop() {
     detectLine();
 
     // Second priority: Find and attack opponent
-    /*minDist = min(IR_LEFT_DISTANCE, min(IR_FORWARD_DISTANCE, IR_FORWARD_RIGHT));
+    minDist = min(IR_LEFT_DISTANCE, min(IR_FORWARD_DISTANCE, IR_FORWARD_RIGHT));
 
   if (minDist > 70) {
     stopMotors();
@@ -240,7 +240,7 @@ void loop() {
     spinLeft();
   } else {
     spinRight();
-  }*/
+  }
   delay(100);
 }
 //}
