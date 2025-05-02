@@ -198,7 +198,7 @@ void loop() {
   float distL = readDistance(IR_LEFT_PIN);
   float distF = readDistance(IR_FORWARD_PIN);
   float distR = readDistance(IR_RIGHT_PIN);
-  float minDist = min(distL, min(distF, distR));
+  float minDist = fmin(distL, min(distF, distR));
 
   if (minDist > 10) {
     detectLine();
